@@ -1,5 +1,10 @@
 # Contacts API (Lambda, API Gateway, DynamoDB)
 
+## Run Lambda locally using SAM
+```zsh
+sam local start-api --log-file quantum.log
+```
+
 ## Docker Compose (for local DynamoDB)
 
 ```yml

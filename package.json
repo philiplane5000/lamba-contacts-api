@@ -2,7 +2,7 @@
   "name": "my-contacts-api",
   "version": "1.0.0",
   "private": true,
-  "devDependencies": {
-    "aws-sdk": "2.814.0"
+  "scripts": {
+    "start": "sam local start-api --log-file quantum.log"
   }
 }
