@@ -25,5 +25,3 @@ export const formatError = error => {
 export const serialize = object => {
   return JSON.stringify(object, null, 2);
 };
-
-// export default { formatResponse, formatError, serialize };

@@ -2,6 +2,21 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Transform": "AWS::Serverless-2016-10-31",
   "Description": "An AWS Lambda application that calls the Lambda API and integrates with DynamoDB.",
+  "Globals": {
+    "Function": {
+      "Runtime": "nodejs18.x",
+      "Layers": [
+        {
+          "Ref": "NodeJsDependenciesLayer"
+        }
+      ],
+      "Environment": {
+        "Variables": {
+          "TABLE_NAME": "Contacts"
+        }
+      }
+    }
+  },
   "Resources": {
     "myDynamoDBTable": {
       "Type": "AWS::DynamoDB::Table",
@@ -27,19 +42,24 @@
             "KeyType": "RANGE"
           }
         ],
-        
+
         "ProvisionedThroughput": {
           "ReadCapacityUnits": 5,
           "WriteCapacityUnits": 5
         }
       }
-    },    
+    },
     "api": {
       "Type": "AWS::Serverless::Api",
       "Properties": {
         "StageName": "api",
         "TracingEnabled": true,
-        "OpenApiVersion": "3.0.2"
+        "OpenApiVersion": "3.0.2",
+        "Cors": {
+          "AllowMethods": "'GET,POST,OPTIONS'",
+          "AllowHeaders": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+          "AllowOrigin": "'https://www.philiplane.io'"
+        }
       }
     },
     "NodeJsDependenciesLayer": {
@@ -51,7 +71,7 @@
         "CompatibleRuntimes": ["nodejs18.x"],
         "LicenseInfo": "Available under the MIT-0 license."
       }
-    },    
+    },
     "function": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
@@ -68,17 +88,10 @@
             "Statement": [
               {
                 "Effect": "Allow",
-                "Action": [
-                  "dynamodb:PutItem",
-                  "dynamodb:UpdateItem",
-                  "dynamodb:DescribeTable"
-                ],
+                "Action": ["dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DescribeTable"],
                 "Resource": [
                   {
-                    "Fn::GetAtt": [
-                      "myDynamoDBTable",
-                      "Arn"
-                    ]
+                    "Fn::GetAtt": ["myDynamoDBTable", "Arn"]
                   }
                 ]
               }
@@ -92,7 +105,7 @@
             "Type": "Api",
             "Properties": {
               "RestApiId": { "Ref": "api" },
-              "Path": "/",
+              "Path": "/describe",
               "Method": "GET"
             }
           },
@@ -104,11 +117,11 @@
               "Method": "POST"
             }
           },
-          "pingPath": {
+          "statusPath": {
             "Type": "Api",
             "Properties": {
               "RestApiId": { "Ref": "api" },
-              "Path": "/ping",
+              "Path": "/status",
               "Method": "GET"
             }
           }
