@@ -1,5 +1,6 @@
 import { DynamoDBClient, DescribeTableCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { formatResponse, formatError, serialize } from './utils/index.mjs';
+import { v4 as uuidv4 } from 'uuid';
 
 /** @type {string} */
 const TABLE_NAME = process.env.TABLE_NAME;
@@ -39,16 +40,30 @@ export const handler = async (event, context) => {
 
   // POST "/contact" adds a new item to the table
   if (path === '/contact' && httpMethod === 'POST') {
-    const requestBody = JSON.parse(body),
-      { firstName = '', lastName = '', email = '', message = '' } = requestBody;
+    /**
+     * Represents the request body object.
+     * @typedef {Object} RequestBody
+     * @property {string} firstName - The first name.
+     * @property {string} lastName - The last name.
+     * @property {string} email - The email address.
+     * @property {string} message - The message.
+     */
+
+    /** @type {RequestBody} */
+    const requestBody = JSON.parse(body);
+
+    // See RequestBody type definition above
+    const { firstName = '', lastName = '', email = '', message = '' } = requestBody;
 
     /** @type {number} */
     const timestamp = Math.floor(new Date().getTime());
-    console.info('Timestamp >> ', timestamp);
+
+    /** @type {string} */
+    const uniqueId = uuidv4(); // (eg) '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
 
     // Define the item to be put into the table
     const item = {
-      id: { N: '0' }, // Assuming 'id' is a numeric attribute
+      id: { S: uniqueId },
       firstName: { S: firstName },
       lastName: { S: lastName },
       email: { S: email },
