@@ -47,7 +47,7 @@
       "Properties": {
         "LayerName": "nodejs-dependencies-layer",
         "Description": "Node.js dependencies layer",
-        "ContentUri": "dependencies/nodejs.zip",
+        "ContentUri": "dependencies/nodejs/",
         "CompatibleRuntimes": ["nodejs18.x"],
         "LicenseInfo": "Available under the MIT-0 license."
       }
