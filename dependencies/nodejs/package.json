@@ -2,7 +2,8 @@
   "name": "my-contacts-api",
   "version": "1.0.0",
   "private": true,
-  "devDependencies": {
-    "aws-sdk": "2.814.0"
+  "dependencies": {
+    "aws-sdk": "2.814.0",
+    "uuid": "^9.0.1"
   }
 }
