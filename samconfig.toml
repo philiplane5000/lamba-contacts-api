@@ -1,0 +1,10 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "my-contacts-api"
+resolve_s3 = false
+s3_prefix = "my-contacts-api"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+s3_bucket = "my-contact-api-artifacts-4de43d58d1d67f3e"
+image_repositories = []

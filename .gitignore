@@ -1,0 +1,25 @@
+# Node.js dependencies
+dependencies/nodejs/node_modules*
+
+# AWS SAM build artifacts
+.aws-sam/
+
+# Local development artifacts
+.nyc_output/
+coverage/
+*.log
+
+# SAM CLI local development
+.sam/local/
+
+# VSCode settings
+.vscode/
+
+# macOS system files
+.DS_Store
+
+# bucket-name
+bucket-name.txt
+
+# .env file
+env.json

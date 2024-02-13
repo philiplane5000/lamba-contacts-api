@@ -1,0 +1,119 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Description": "An AWS Lambda application that calls the Lambda API and integrates with DynamoDB.",
+  "Resources": {
+    "myDynamoDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "Contacts",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "N"
+          },
+          {
+            "AttributeName": "timestamp",
+            "AttributeType": "N"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "timestamp",
+            "KeyType": "RANGE"
+          }
+        ],
+        
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": 5,
+          "WriteCapacityUnits": 5
+        }
+      }
+    },    
+    "api": {
+      "Type": "AWS::Serverless::Api",
+      "Properties": {
+        "StageName": "api",
+        "TracingEnabled": true,
+        "OpenApiVersion": "3.0.2"
+      }
+    },
+    "NodeJsDependenciesLayer": {
+      "Type": "AWS::Serverless::LayerVersion",
+      "Properties": {
+        "LayerName": "nodejs-dependencies-layer",
+        "Description": "Node.js dependencies layer",
+        "ContentUri": "dependencies/nodejs.zip",
+        "CompatibleRuntimes": ["nodejs18.x"],
+        "LicenseInfo": "Available under the MIT-0 license."
+      }
+    },    
+    "function": {
+      "Type": "AWS::Serverless::Function",
+      "Properties": {
+        "Handler": "index.handler",
+        "Runtime": "nodejs18.x",
+        "CodeUri": "src/",
+        "Description": "The Contacts AWS Lambda API",
+        "Timeout": 10,
+        "Policies": [
+          "AWSLambdaBasicExecutionRole",
+          "AWSLambda_ReadOnlyAccess",
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:PutItem",
+                  "dynamodb:UpdateItem",
+                  "dynamodb:DescribeTable"
+                ],
+                "Resource": [
+                  {
+                    "Fn::GetAtt": [
+                      "myDynamoDBTable",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "AWSXrayWriteOnlyAccess"
+        ],
+        "Tracing": "Active",
+        "Events": {
+          "getEndpoint": {
+            "Type": "Api",
+            "Properties": {
+              "RestApiId": { "Ref": "api" },
+              "Path": "/",
+              "Method": "GET"
+            }
+          },
+          "postContact": {
+            "Type": "Api",
+            "Properties": {
+              "RestApiId": { "Ref": "api" },
+              "Path": "/contact",
+              "Method": "POST"
+            }
+          },
+          "pingPath": {
+            "Type": "Api",
+            "Properties": {
+              "RestApiId": { "Ref": "api" },
+              "Path": "/ping",
+              "Method": "GET"
+            }
+          }
+        }
+      }
+    }
+  }
+}
